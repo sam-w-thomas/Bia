@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <!-- Handle creation of ROW -->
+    {% set properties = device.get_properties() %}
+    {% set abilities = device.get_capability() %}
+    <div class="row mt-2">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ device.name }}</h5>
+                <br>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Type</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Last pinged</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{ device.type }}</td>
+                        <td>{{ device.address }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Capability</th>
+                        <th scope="col">Value</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for ability,value in abilities.items() %}
+                    <tr>
+                        <td>{{ ability }}</td>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <a href="/devices" class="btn btn-primary mt-3">Return to devices</a>
+            </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-body">
+                <h5 class="card-title">Current Statistics</h5>
+            </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-body">
+                <h5 class="card-title">Historic Statistics</h5>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

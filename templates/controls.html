@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <form action="/device_snapshot" method="POST" style="display:inline">
+        <button type="submit" class="btn btn-primary">Snapshot</button>
+    </form>
+    {% if capturing %}
+    <form action="/enable_capture" method="POST" style="display:inline">
+        <button type="submit" class="btn btn-success">Begin capture</button>
+    </form>
+    {% else %}
+    <form action="/disable_capture" method="POST" style="display:inline">
+        <button type="submit" class="btn btn-danger">Stop capture</button>
+    </form>
+    {% endif %}
+
+    <div class="row mt-2">
+        <div class="card">
+            <div class="card-body">
+                <form action="/add_device" method="POST">
+                    <div class="form-group">
+                        <label for="device_name">Capture Interval</label>
+                        <input type="text" class="form-control" id="device_name" name="device_name"
+                               placeholder="Enter capture interval (seconds)" value="{{ time_interval }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-4">Update Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row mt-2">
+        <h1>Data Snapshots</h1>
+        <div class="card mt-2">
+            <div class="card-body">
+                Example of Snapshot data
+            </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-body">
+                Example of Snapshot data
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

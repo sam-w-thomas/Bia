@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-3">
+    <!-- Handle creation of ROW -->
+    {% for device in devices %}
+    {% set properties = device.get_properties() %}
+    <div class="row mt-2">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ device.name }} | {{device.type.value}} </h5>
+                {% for key,value in properties.items() %}
+                <button type="button" class="btn btn-success">{{ key }} - {{ value }}</button>
+                {% endfor %}
+                <br>
+                <a href="/device/{{ device.uuid }}" class="btn btn-primary mt-3">View device</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
