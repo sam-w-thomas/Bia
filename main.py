@@ -1,6 +1,7 @@
 from devices import DeviceType
 from devices import device_factory
 from devices import get_devices
+from devices import delete_device
 from capture import snapshot
 from capture import Periodic
 
@@ -21,11 +22,15 @@ def devices():
     return render_template('devices.html', devices=get_devices())
 
 
-@app.route('/device/<device_id>')
+@app.route('/device/<device_id>', methods=['GET', 'POST'])
 def device(
         device_id
 ):
-    return render_template('device.html', device=get_devices(device_id))
+    if request.method == "POST":
+        delete_device(device_id)
+        return redirect("/devices")
+    if request.method == "GET":
+        return render_template('device.html', device=get_devices(device_id))
 
 
 @app.route('/controls')

@@ -40,7 +40,10 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <a href="/devices" class="btn btn-primary mt-3">Return to devices</a>
+                <a href="/devices" class="btn btn-primary mt-3" style="display:inline">Return to devices</a>
+                <form action="/device/{{ device.uuid }}" method="POST" style="display:inline">
+                    <button type="submit" class="btn btn-danger">Delete Device</button>
+                </form>
             </div>
         </div>
         <div class="card mt-2">
@@ -51,6 +54,11 @@
         <div class="card mt-2">
             <div class="card-body">
                 <h5 class="card-title">Historic Statistics</h5>
+            </div>
+        </div>
+        <div class="card mt-2">
+            <div class="card-body">
+                <h5 class="card-title">Raw Data</h5>
             </div>
         </div>
     </div>

@@ -5,7 +5,11 @@ from devices import get_devices
 import csv
 from threading import Timer, Lock
 from datetime import datetime
+import yaml
 
+# Read configuration
+with open('configuration.yaml', 'r') as config_file:
+    bia_config = yaml.safe_load(config_file)
 
 class Periodic(object):
     """
@@ -64,8 +68,8 @@ def write_csv_line(device_id,
     with open(f'data/{device_id}.csv', 'a', newline='') as csvfile:
         device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        date_str = time_captured.strftime("%m/%d/%Y, %H:%M:%S")
-        device_writer.writerow([date_str, power, voltage, current])
+        date_str = time_captured.isoformat()
+        device_writer.writerow([date_str, power, voltage, current, bia_config['time_interval']])
 
 
 def snapshot():

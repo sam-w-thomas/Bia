@@ -1,10 +1,11 @@
 from kasa import SmartPlug
 
 import asyncio
+import csv
 from enum import Enum
 import uuid
 import json
-
+import os
 
 class DeviceType(Enum):
     SMARTPLUG = "SMARTPLUG"
@@ -22,6 +23,11 @@ class Device:
     @classmethod
     def new_device(cls, name, address):
         device_uuid = uuid.uuid4()
+
+        with open(f'data/{device_uuid}.csv', 'w', newline='') as csvfile:
+            device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            device_writer.writerow(['timestamp','power', 'voltage', 'current'])
+
         return cls(name, address, device_uuid)
 
     @property
@@ -147,6 +153,21 @@ def get_devices(
 
     return converted_devices
 
+
 def device_factory(device_name, device_type, device_address):
     if device_type == DeviceType.SMARTPLUG.value:
         return SmartPlugDevice.new_device(device_name, device_address)
+
+
+def delete_device(device_id):
+    if os.path.exists(f'data/{device_id}.csv'):
+        os.remove(f'data/{device_id}.csv')
+
+    with open('inventory/devices.json', 'r+') as device_file:
+        raw_devices = json.load(device_file)
+
+        del raw_devices[device_id]
+
+        device_file.seek(0)
+        json.dump(raw_devices, device_file)
+        device_file.truncate()
