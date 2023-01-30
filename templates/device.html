@@ -49,16 +49,96 @@
         <div class="card mt-2">
             <div class="card-body">
                 <h5 class="card-title">Current Statistics</h5>
+
+                {% set properties = device.get_properties() %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        {% for key in properties.keys() %}
+                        <th scope="col">{{ key }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for value in properties.values() %}
+                        <td scope="col">{{ value }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+
             </div>
         </div>
         <div class="card mt-2">
             <div class="card-body">
-                <h5 class="card-title">Historic Statistics</h5>
+                <h5>Historic Statistics</h5>
+                <small>Select a datetime in range below and page loads with only data points from that time</small>
+                <div class="container mt-2">
+                    <form action="/device/{{ device.uuid }}" method="GET">
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="start_time_prepend">Start Time</span>
+                                    </div>
+                                    <input type="datetime-local" class="form-control" name="start_time" id="start_time"
+                                           style="display:inline">
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="end_time_prepend">End Time</span>
+                                    </div>
+                                    <input type="datetime-local" class="form-control" name="end_time" id="end_time"
+                                           style="display:inline">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">View times</button>
+                    </form>
+                </div>
+                <hr>
+                {% set total_power = dev_history.sum_usage(start_time,end_time) %}
+                {% set average = dev_history.mean(start_time,end_time) %}
+                {% set data_points = dev_history.length(start_time, end_time) %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Total Power Usage</th>
+                        <th scope="col">Average Power</th>
+                        <th scope="col">Gathered data points</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{ total_power }}</td>
+                        <td>{{ average }}</td>
+                        <td>{{ data_points }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <hr>
+                <img src="/device/{{ device.uuid }}/usage_graph.png?start_time={{ start_time_raw }}&end_time={{ end_time_raw }}"
+                     alt="Graph of wattage of device">
             </div>
         </div>
         <div class="card mt-2">
             <div class="card-body">
                 <h5 class="card-title">Raw Data</h5>
+                <table class="table">
+                    {% for point in dev_history.raw_data()%}
+                    <tbody>
+                    <tr>
+                    {% for value,data in point.items() %}
+                        <td>{{ value }}</td>
+                        <td>{{ data }}</td>
+                    {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

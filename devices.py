@@ -1,4 +1,5 @@
 from kasa import SmartPlug
+from kasa import SmartDeviceException
 
 import asyncio
 import csv
@@ -26,7 +27,7 @@ class Device:
 
         with open(f'data/{device_uuid}.csv', 'w', newline='') as csvfile:
             device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            device_writer.writerow(['timestamp','power', 'voltage', 'current'])
+            device_writer.writerow(['timestamp','power', 'voltage', 'current', 'interval'])
 
         return cls(name, address, device_uuid)
 
@@ -59,6 +60,9 @@ class Device:
         pass
 
     def get_capability(self):
+        pass
+
+    def is_connected(self):
         pass
 
     def save(self):
@@ -96,6 +100,9 @@ class SmartPlugDevice(Device):
     def get_capability(self):
         return asyncio.get_event_loop().run_until_complete(self.get_cap_stats())
 
+    def connected(self):
+        return asyncio.get_event_loop().run_until_complete(self.is_connected())
+
     def get_power(self):
         return self.get_stats()['power']
 
@@ -131,6 +138,15 @@ class SmartPlugDevice(Device):
 
         return {**cap_stats, **device.hw_info}
 
+    async def is_connected(self):
+        device = self._kasa_device
+        try:
+            await device.update()  # Request an update
+        except SmartDeviceException:
+            return False
+
+        return device.is_on
+
 def get_devices(
         device_id = None
 ):
@@ -149,7 +165,10 @@ def get_devices(
         if device_details['type'] == "SMARTPLUG":
             converted_device = SmartPlugDevice(device_details['name'], device_details['address'], device_uuid)
 
-        converted_devices.append(converted_device)
+        if converted_device.connected():
+            converted_devices.append(converted_device) # check to confirm for connected devices, little hack for testing
+            # lab purposes currently. Ideally disconnected devices would still show
+
 
     return converted_devices
 
