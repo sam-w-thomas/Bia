@@ -78,12 +78,13 @@ def snapshot():
     print("Snapshotting")
 
     for device in devices:
-        device_stats = device.get_stats()
-        power = device_stats['power']
-        voltage = device_stats['voltage']
-        current = device_stats['current']
+        if device.connected():
+            device_stats = device.get_stats()
+            power = device_stats['power']
+            voltage = device_stats['voltage']
+            current = device_stats['current']
 
-        current_date = datetime.now()
+            current_date = datetime.now()
 
-        write_csv_line(device.uuid, current_date, power, voltage, current)
+            write_csv_line(device.uuid, current_date, power, voltage, current)
 

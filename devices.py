@@ -9,10 +9,9 @@ import uuid
 import json
 import os
 
+
 class DeviceType(Enum):
     SMARTPLUG = "SMARTPLUG"
-    CISCO_ROUTER = "CISCOROUTER"
-    CISCO_SWITCH = "CISCOSWITCH"
     CISCO = "CISCO"
 
 
@@ -29,7 +28,7 @@ class Device:
 
         with open(f'data/{device_uuid}.csv', 'w', newline='') as csvfile:
             device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            device_writer.writerow(['timestamp','power', 'voltage', 'current', 'interval'])
+            device_writer.writerow(['timestamp', 'power', 'voltage', 'current', 'interval'])
 
         return cls(name, address, device_uuid)
 
@@ -143,11 +142,12 @@ class SmartPlugDevice(Device):
     async def is_connected(self):
         device = self._kasa_device
         try:
-            await device.update()  # Request an update
-        except SmartDeviceException:
+            await asyncio.wait_for(device.update(), timeout=0.7)
+        except:
             return False
 
         return device.is_on
+
 
 class CiscoDevice(Device):
     def __init__(self, name, address, device_uuid, username, password):
@@ -186,7 +186,7 @@ class CiscoDevice(Device):
         return capabilities
 
     def connected(self):
-        return False # Figure out
+        return False  # Figure out
 
     def get_power(self):
         self._device.open()
@@ -199,7 +199,7 @@ class CiscoDevice(Device):
         device_stats = self.get_stats()
         return {
             'power': device_stats['power']['output'],
-            'capacity':  device_stats['power']['capacity'],
+            'capacity': device_stats['power']['capacity'],
             'cpu': device_stats['cpu'],
             'memory': device_stats['memory'],
         }
@@ -227,8 +227,9 @@ class CiscoDevice(Device):
             json.dump(raw_devices, device_file)
             device_file.truncate()
 
+
 def get_devices(
-        device_id = None
+        device_id=None
 ):
     with open('inventory/devices.json') as device_file:
         raw_devices = json.load(device_file)
@@ -237,7 +238,6 @@ def get_devices(
     if device_id:
         device_details = raw_devices[device_id]
         return SmartPlugDevice(device_details['name'], device_details['address'], device_id)
-
 
     # Return multiple devices if no device_id supplied
     converted_devices = []
@@ -252,10 +252,9 @@ def get_devices(
                                            device_details['username'],
                                            device_details['password'])
 
-        #if converted_device.connected():
-        converted_devices.append(converted_device) # check to confirm for connected devices, little hack for testing
-            # lab purposes currently. Ideally disconnected devices would still show
-
+        # if converted_device.connected():
+        converted_devices.append(converted_device)  # check to confirm for connected devices, little hack for testing
+        # lab purposes currently. Ideally disconnected devices would still show
 
     return converted_devices
 
@@ -265,6 +264,7 @@ def device_factory(device_name, device_type, device_address, device_username=Non
         return SmartPlugDevice.new_device(device_name, device_address)
     elif device_type == DeviceType.CISCO.value:
         return CiscoDevice.new_device(device_name, device_address, device_username, device_password)
+
 
 def delete_device(device_id):
     if os.path.exists(f'data/{device_id}.csv'):
