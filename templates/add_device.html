@@ -4,7 +4,7 @@
     <!-- Handle creation of ROW -->
     <div class="card">
         <div class="card-body">
-            <form action="/add_device" method="POST">
+            <form id="add_device_form" action="/add_device" method="POST">
                 <div class="form-group">
                     <label for="device_name">Device Name</label>
                     <input type="text" class="form-control" id="device_name" name="device_name" placeholder="Enter name">
@@ -24,9 +24,63 @@
                     <small id="address_help" class="form-text text-muted">Tip: Find this via configuration or a routers
                         device table</small>
                 </div>
-                <button type="submit" class="btn btn-primary mt-4">Add Device</button>
+                <button type="submit" class="btn btn-primary mt-4" id="device_submit">Add Device</button>
             </form>
         </div>
     </div>
 </div>
+<script>
+    var device_form = document.getElementById("add_device_form");
+    var device_type_form = document.getElementById("device_type");
+    var device_form_submit = document.getElementById("device_submit");
+
+    function addCredFields(){
+        // Create username fields
+        var username_form_group = document.createElement("div");
+        username_form_group.className = "form-group mt-2"
+
+        var username_label = document.createElement("label");
+        username_label.htmlFor = "device_username"
+        username_label.innerHTML = "Device Username"
+
+        var username_input = document.createElement("input");
+        username_input.type = "text";
+        username_input.className = "form-control";
+        username_input.name = "device_username";
+        username_input.id = "device_username"
+        username_input.placeholder = "Username of valid user"
+
+        username_form_group.appendChild(username_label)
+        username_form_group.appendChild(username_input)
+
+        // Setup password form group
+        var password_form_group = document.createElement("div");
+        password_form_group.className = "form-group mt-2"
+
+        var password_label = document.createElement("label");
+        password_label.htmlFor = "device_password"
+        password_label.innerHTML = "Device Password"
+
+        var password_input = document.createElement("input");
+        password_input.type = "text";
+        password_input.className = "form-control";
+        password_input.name = "device_password";
+        password_input.id = "device_password"
+        password_input.placeholder = "Password of valid user"
+
+        password_form_group.appendChild(password_label)
+        password_form_group.appendChild(password_input)
+
+        device_form.insertBefore(username_form_group, device_form_submit);
+        device_form.insertBefore(password_form_group, device_form_submit);
+    }
+
+    device_type_form.onchange = (event) => {
+     var inputText = event.target.value;
+     if (inputText === "CISCO") {
+         addCredFields()
+     }
+
+    }
+</script>
 {% endblock %}

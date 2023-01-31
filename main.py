@@ -72,19 +72,36 @@ def add_device():
         device_types = [member.value for member in DeviceType]
         return render_template('add_device.html', device_types=device_types)
     elif request.method == "POST":
-
-        # Get details from form
-        device_name = request.form.get('device_name')
         device_type = request.form.get('device_type')
-        device_address = request.form.get('device_address')
+        if device_type == "SMARTPLUG":
+            # Get details from form
+            device_name = request.form.get('device_name')
+            device_address = request.form.get('device_address')
 
-        unsaved_device = device_factory(
-            device_name,
-            device_type,
-            device_address
-        )
+            unsaved_device = device_factory(
+                device_name,
+                device_type,
+                device_address
+            )
 
-        unsaved_device.save()
+            unsaved_device.save()
+
+        if device_type == "CISCO":
+            # Get details from form
+            device_name = request.form.get('device_name')
+            device_address = request.form.get('device_address')
+            device_username = request.form.get('device_username')
+            device_password = request.form.get('device_password')
+
+            unsaved_device = device_factory(
+                device_name,
+                device_type,
+                device_address,
+                device_username=device_username,
+                device_password=device_password
+            )
+
+            unsaved_device.save()
 
         return redirect("/")
 
