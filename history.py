@@ -127,3 +127,9 @@ class DeviceHistory:
         plt.ylabel('Watt')
 
         return fig
+
+    def empty(self):
+        if len(self._history) == 0:
+            return True
+        else:
+            return False

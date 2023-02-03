@@ -142,7 +142,7 @@ class SmartPlugDevice(Device):
     async def is_connected(self):
         device = self._kasa_device
         try:
-            await asyncio.wait_for(device.update(), timeout=0.7)
+            await asyncio.wait_for(device.update(), timeout=0.75)
         except:
             return False
 
@@ -237,7 +237,15 @@ def get_devices(
     # Return single device if device_id supplied
     if device_id:
         device_details = raw_devices[device_id]
-        return SmartPlugDevice(device_details['name'], device_details['address'], device_id)
+        dev_type = device_details['type']
+        if dev_type == "SMARTPLUG":
+            return SmartPlugDevice(device_details['name'], device_details['address'], device_id)
+        elif dev_type == "CISCO":
+            return CiscoDevice(device_details['name'],
+                               device_details['address'],
+                               device_id,
+                               device_details['username'],
+                               device_details['password'])
 
     # Return multiple devices if no device_id supplied
     converted_devices = []

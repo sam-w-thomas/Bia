@@ -2,6 +2,7 @@
 {% block content %}
 <div class="container mt-3">
     {% set dev_connected = device.connected() %}
+    {% set history_empty = dev_history.empty() %}
     <!-- Handle creation of ROW -->
     <div class="row mt-2">
         <div class="card">
@@ -43,7 +44,7 @@
                     </tbody>
                 </table>
                 {% else %}
-                    <p class="text-danger">Device not connected, unable to get current data</p>
+                    <p class="text-danger">Device not connected, unable to get capabilities</p>
                 {% endif %}
                 <a href="/devices" class="btn btn-primary mt-3" style="display:inline">Return to devices</a>
                 <form action="/device/{{ device.uuid }}" method="POST" style="display:inline">
@@ -73,7 +74,7 @@
                     </tbody>
                 </table>
                 {% else %}
-                    <p class="text-danger">Device not connected, unable to get current data</p>
+                    <p class="text-danger">Device not connected, unable to get current statistics</p>
                 {% endif %}
 
             </div>
@@ -81,6 +82,7 @@
         <div class="card mt-2">
             <div class="card-body">
                 <h5>Historic Statistics</h5>
+                {% if not history_empty %}
                 <small>Select a datetime in range below and page loads with only data points from that time</small>
                 <div class="container mt-2">
                     <form action="/device/{{ device.uuid }}" method="GET">
@@ -130,6 +132,11 @@
                 <hr>
                 <img src="/device/{{ device.uuid }}/usage_graph.png?start_time={{ start_time_raw }}&end_time={{ end_time_raw }}"
                      alt="Graph of wattage of device">
+
+                {% else %}
+                <p class="text-warning">No data snapshots taken, cannot view historic snapshots</p>
+                {% endif %}
+
             </div>
         </div>
         <div class="card mt-2">
