@@ -1,5 +1,8 @@
 from kasa import SmartPlug
 from kasa import SmartDeviceException
+from scrapli.driver.core import IOSXEDriver
+from scrapli.helper import textfsm_parse
+from scrapli import Scrapli
 
 import asyncio
 import csv
@@ -152,16 +155,31 @@ class SmartPlugDevice(Device):
 class CiscoDevice(Device):
     def __init__(self, name, address, device_uuid, username, password):
         Device.__init__(self, name, address, device_uuid)
+
+        # Setup Napalm
         self._driver = napalm.get_network_driver("ios")
-        self._con_details = conn_details = {
+        conn_details = {
             "hostname": address,
             "username": username,
             "password": password
         }
-        self._device = self._driver(**self._con_details)
+        self._device = self._driver(**conn_details)
         self._username = username
         self._password = password
         self.type = DeviceType.CISCO
+
+        # Setup Scrapli, primarily for TextFSM parsing
+        scrapli_conn_details = {
+            "host": "192.168.1.21",
+            "auth_username": "samwthomas",
+            "auth_password": "samwthomas",
+            "auth_strict_key": False,
+            "platform": "cisco_iosxe",
+            "transport": "paramiko"
+        }
+
+        self._scrapli_device = Scrapli(**scrapli_conn_details)
+
 
     @classmethod
     def new_device(cls, name, address, username, password):
@@ -186,23 +204,30 @@ class CiscoDevice(Device):
         return capabilities
 
     def connected(self):
-        return False  # Figure out
+        return True  # Figure out
 
     def get_power(self):
-        self._device.open()
-        dev_env = self._device.get_environment()
-        power = dev_env['power']['output']
-        self._device.close()
-        return power
+        self._scrapli_device.open()
+        response = self._scrapli_device.send_command("show environment")
+        enviroment_result = textfsm_parse("textfsm_templates/r2911_show_enviroment.textfsm", response.result)[0] #Select first one, show enviroment won't have multiple instances
+        self._scrapli_device.close()
+        print(enviroment_result)
+        return enviroment_result['systempower']
 
     def get_properties(self):
         device_stats = self.get_stats()
-        return {
-            'power': device_stats['power']['output'],
-            'capacity': device_stats['power']['capacity'],
-            'cpu': device_stats['cpu'],
-            'memory': device_stats['memory'],
-        }
+        properties = {}
+
+        # get power
+        if "output" in device_stats['power']:
+            properties['power'] = device_stats['power']['output']
+        else:
+            properties['power'] = self.get_power()
+        
+        properties['cpu'] = device_stats['cpu'][0]['%usage']
+        properties['memory'] = device_stats['memory']['used_ram'],
+
+        return properties
 
     def save(self):
         """

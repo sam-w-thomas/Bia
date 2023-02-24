@@ -80,9 +80,21 @@ def snapshot():
     for device in devices:
         if device.connected():
             device_stats = device.get_stats()
-            power = device_stats['power']
-            voltage = device_stats['voltage']
-            current = device_stats['current']
+
+            if 'power' in device_stats:
+                power = device_stats['power']
+            else:
+                power = None
+            
+            if 'voltage' in device_stats:
+                voltage = device_stats['voltage']
+            else:
+                voltage = None
+            
+            if 'current' in device_stats:
+                current = device_stats['current']
+            else:
+                current = None
 
             current_date = datetime.now()
 
