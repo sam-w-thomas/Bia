@@ -51,9 +51,7 @@ class Periodic(object):
 
 def write_csv_line(device_id,
                    time_captured,
-                   power=None,
-                   voltage=None,
-                   current=None):
+                   power=None):
     """
     Writs data to a devices data .csv
 
@@ -69,7 +67,7 @@ def write_csv_line(device_id,
         device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         date_str = time_captured.isoformat()
-        device_writer.writerow([date_str, power, voltage, current, bia_config['time_interval']])
+        device_writer.writerow([date_str, power, bia_config['time_interval']])
 
 
 def snapshot():
@@ -85,18 +83,8 @@ def snapshot():
                 power = device_stats['power']
             else:
                 power = None
-            
-            if 'voltage' in device_stats:
-                voltage = device_stats['voltage']
-            else:
-                voltage = None
-            
-            if 'current' in device_stats:
-                current = device_stats['current']
-            else:
-                current = None
 
             current_date = datetime.now()
 
-            write_csv_line(device.uuid, current_date, power, voltage, current)
+            write_csv_line(device.uuid, current_date, power)
 

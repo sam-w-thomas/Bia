@@ -31,7 +31,7 @@ class Device:
 
         with open(f'data/{device_uuid}.csv', 'w', newline='') as csvfile:
             device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            device_writer.writerow(['timestamp', 'power', 'voltage', 'current', 'interval'])
+            device_writer.writerow(['timestamp', 'power', 'interval'])
 
         return cls(name, address, device_uuid)
 
@@ -192,16 +192,22 @@ class CiscoDevice(Device):
         return cls(name, address, device_uuid, username, password)
 
     def get_stats(self):
-        self._device.open()
-        dev_env = self._device.get_environment()
-        self._device.close()
-        return dev_env
+        try:
+            self._device.open()
+            dev_env = self._device.get_environment()
+            self._device.close()
+            return dev_env
+        except napalm.base.exceptions.ConnectionException:
+            return {}
 
     def get_capability(self):
-        self._device.open()
-        capabilities = self._device.get_facts()
-        self._device.close()
-        return capabilities
+        try:
+            self._device.open()
+            capabilities = self._device.get_facts()
+            self._device.close()
+            return capabilities
+        except napalm.base.exceptions.ConnectionException:
+            return {}
 
     def connected(self):
         return True  # Figure out
@@ -218,14 +224,18 @@ class CiscoDevice(Device):
         device_stats = self.get_stats()
         properties = {}
 
-        # get power
-        if "output" in device_stats['power']:
-            properties['power'] = device_stats['power']['output']
-        else:
-            properties['power'] = self.get_power()
+        if 'power' in device_stats:
+            # get power
+            if "output" in device_stats['power']:
+                properties['power'] = device_stats['power']['output']
+            else:
+                properties['power'] = self.get_power()
         
-        properties['cpu'] = device_stats['cpu'][0]['%usage']
-        properties['memory'] = device_stats['memory']['used_ram'],
+        if 'cpu' in device_stats:
+            properties['cpu'] = device_stats['cpu'][0]['%usage']
+
+        if 'memory' in device_stats:
+            properties['memory'] = device_stats['memory']['used_ram'],
 
         return properties
 

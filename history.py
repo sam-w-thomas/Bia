@@ -67,8 +67,6 @@ class DeviceHistory:
                 history_data.append([
                     capture['timestamp'],
                     float(capture['power']),
-                    float(capture['voltage']),
-                    float(capture['current']),
                     capture['interval']
                 ])
 
