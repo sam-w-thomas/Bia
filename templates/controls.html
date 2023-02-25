@@ -29,18 +29,22 @@
         </div>
     </div>
     <hr>
-    <div class="row mt-2">
-        <h1>Data Snapshots</h1>
-        <div class="card mt-2">
+    <div class="card mt-2">
             <div class="card-body">
-                Example of Snapshot data
+                <h5 class="card-title">Raw Data</h5>
+                <table class="table">
+                    {% for point in data_points %}
+                    <tbody>
+                    <tr>
+                    {% for value,data in point.items() %}
+                        <td>{{ value }}</td>
+                        <td>{{ data }}</td>
+                    {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="card mt-2">
-            <div class="card-body">
-                Example of Snapshot data
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}

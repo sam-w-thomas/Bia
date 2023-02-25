@@ -1,3 +1,4 @@
+import history
 from devices import DeviceType
 from devices import device_factory
 from devices import get_devices
@@ -63,7 +64,12 @@ def device(
 
 @app.route('/controls')
 def controls():
-    return render_template('controls.html', capturing=capture_sched.stopped, time_interval=bia_config['time_interval'])
+    data_points = history.get_all_data_points()
+
+    return render_template('controls.html',
+                           capturing=capture_sched.stopped,
+                           time_interval=bia_config['time_interval'],
+                           data_points=data_points)
 
 
 @app.route('/add_device', methods=['GET', 'POST'])

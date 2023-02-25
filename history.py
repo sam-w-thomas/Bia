@@ -5,6 +5,7 @@ import numpy as np
 import csv
 import datetime
 import statistics as stats
+import os
 
 
 class DeviceHistory:
@@ -131,3 +132,25 @@ class DeviceHistory:
             return True
         else:
             return False
+
+def get_all_data_points():
+    """
+    Return all energy data points in each data folder
+
+    :return:
+    """
+
+    data_points = []
+
+    # get all data points
+    directory = os.fsencode('data')
+
+    for device_data in os.listdir(directory):
+        with open(f'data/{device_data.decode("utf-8")}', 'r', newline='') as csv_file:
+            csv_reader = csv.DictReader(csv_file)
+
+            for row in csv_reader:
+                row['device'] = device_data.decode("utf-8")
+                data_points.append(row)
+
+    return data_points
