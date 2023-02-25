@@ -88,7 +88,7 @@ class DeviceHistory:
 
         for capture in self.history(start_time, end_time):
             power = float(capture[1])  # measured in watts
-            interval = int(capture[4])  # measured in seconds
+            interval = int(capture[2])  # measured in seconds
 
             # convert interval ot hours
             interval_hour = interval / 3600

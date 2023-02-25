@@ -161,7 +161,8 @@ class CiscoDevice(Device):
         conn_details = {
             "hostname": address,
             "username": username,
-            "password": password
+            "password": password,
+            "timeout": 0.75
         }
         self._device = self._driver(**conn_details)
         self._username = username
@@ -170,9 +171,9 @@ class CiscoDevice(Device):
 
         # Setup Scrapli, primarily for TextFSM parsing
         scrapli_conn_details = {
-            "host": "192.168.1.21",
-            "auth_username": "samwthomas",
-            "auth_password": "samwthomas",
+            "host": address,
+            "auth_username": username,
+            "auth_password": password,
             "auth_strict_key": False,
             "platform": "cisco_iosxe",
             "transport": "paramiko"
@@ -187,7 +188,7 @@ class CiscoDevice(Device):
 
         with open(f'data/{device_uuid}.csv', 'w', newline='') as csvfile:
             device_writer = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            device_writer.writerow(['timestamp', 'power', 'voltage', 'current', 'interval'])
+            device_writer.writerow(['timestamp', 'power', 'interval'])
 
         return cls(name, address, device_uuid, username, password)
 
@@ -210,7 +211,12 @@ class CiscoDevice(Device):
             return {}
 
     def connected(self):
-        return True  # Figure out
+        try:
+            self._device.open()
+            self._device.close()
+            return True
+        except napalm.base.exceptions.ConnectionException:
+            return False
 
     def get_power(self):
         self._scrapli_device.open()
@@ -224,12 +230,12 @@ class CiscoDevice(Device):
         device_stats = self.get_stats()
         properties = {}
 
-        if 'power' in device_stats:
-            # get power
-            if "output" in device_stats['power']:
-                properties['power'] = device_stats['power']['output']
-            else:
-                properties['power'] = self.get_power()
+        print(device_stats)
+
+        if 'power' in device_stats and "output" in device_stats['power']:
+            properties['power'] = device_stats['power']['output']
+        else:
+            properties['power'] = self.get_power()
         
         if 'cpu' in device_stats:
             properties['cpu'] = device_stats['cpu'][0]['%usage']
@@ -264,7 +270,8 @@ class CiscoDevice(Device):
 
 
 def get_devices(
-        device_id=None
+        device_id=None,
+        check_connected=False
 ):
     with open('inventory/devices.json') as device_file:
         raw_devices = json.load(device_file)
@@ -295,9 +302,11 @@ def get_devices(
                                            device_details['username'],
                                            device_details['password'])
 
-        # if converted_device.connected():
-        converted_devices.append(converted_device)  # check to confirm for connected devices, little hack for testing
-        # lab purposes currently. Ideally disconnected devices would still show
+        if check_connected:
+            if converted_device.connected():
+                converted_devices.append(converted_device)
+        else:
+            converted_devices.append(converted_device)
 
     return converted_devices
 

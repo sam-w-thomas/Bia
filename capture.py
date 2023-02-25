@@ -77,7 +77,7 @@ def snapshot():
 
     for device in devices:
         if device.connected():
-            device_stats = device.get_stats()
+            device_stats = device.get_properties()
 
             if 'power' in device_stats:
                 power = device_stats['power']
