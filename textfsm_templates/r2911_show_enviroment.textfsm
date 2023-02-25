@@ -1,8 +1,8 @@
-Value SystemPower (\d+)
+Value SystemPower (\S+)
 Value PowerSupplyTemp (\d+)
 Value CpuTemp (\d+)
 
 Start
  ^ CPU temperature: ${CpuTemp}\S+
  ^ Power Supply Unit temperature: ${PowerSupplyTemp}\S+
- ^ Total System Power consumption is: ${SystemPower}\S+
+ ^ Total System Power consumption is: ${SystemPower} W
