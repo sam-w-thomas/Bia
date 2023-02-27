@@ -32,11 +32,14 @@ KASA smart plugs are used when devices don't natively support grabbing power con
 ![image](https://i.ibb.co/NmNpjzj/bia-devices.png)
 ![image](https://i.ibb.co/5jV4CDw/bia-disconnected-devices.png)
 ![image](https://i.ibb.co/VDWz9R0/bia-smart-plug.png)
-## ToDo
+
+## Must Do
 * Enable controls to change capture interval via GUI - currently done via configuration.yaml file and a restart
-* Add proper documentation to each function/class
 * Speed up load times
 * Add aggregate historical stats
+
+## Could Do
+* Integrate with electricity provider API's to enable dynamic power/cost consumption reporting
 
 # Known Bugs
 * Too short Capture Interval can cause issues

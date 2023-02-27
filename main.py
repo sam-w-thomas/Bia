@@ -25,6 +25,9 @@ capture_sched = Periodic(bia_config['time_interval'], snapshot)
 @app.route('/')
 @app.route('/devices')
 def devices():
+    """
+    Provide details on all devices
+    """
     return render_template('devices.html', devices=get_devices())
 
 
@@ -32,6 +35,11 @@ def devices():
 def device(
         device_id
 ):
+    """
+    Provide details on individual device
+
+    :param device_id: ID of device in inventory
+    """
     if request.method == "GET":
         if request.args.get('start_time'):
             start_time_raw = request.args.get('start_time')
@@ -64,6 +72,10 @@ def device(
 
 @app.route('/controls')
 def controls():
+    """
+    Controls is the settings page
+    Work needed here to make settings usable - currently loads off configuration.yaml and requires restart
+    """
     data_points = history.get_all_data_points()
 
     return render_template('controls.html',
@@ -74,6 +86,9 @@ def controls():
 
 @app.route('/add_device', methods=['GET', 'POST'])
 def add_device():
+    """
+    Add device to inventory
+    """
     if request.method == "GET":
         device_types = [member.value for member in DeviceType]
         return render_template('add_device.html', device_types=device_types)
@@ -114,6 +129,10 @@ def add_device():
 
 @app.route('/device_snapshot', methods=['POST'])
 def device_snapshot():
+    """
+    Snapshot power consumption across all devices
+    Adds consumption to "data" folder
+    """
     if request.method == "POST":
         snapshot()
 
@@ -122,6 +141,9 @@ def device_snapshot():
 
 @app.route('/enable_capture', methods=['POST'])
 def enable_capture():
+    """
+    Enable periodic capture (snapshots at interval)
+    """
     if request.method == "POST":
         capture_sched.start()
 
@@ -130,14 +152,24 @@ def enable_capture():
 
 @app.route('/disable_capture', methods=['POST'])
 def disable_capture():
+    """
+    Disable periodic capture (snapshots at interval)
+    """
     if request.method == "POST":
         capture_sched.stop()
 
         return redirect("/controls")
 
-
 @app.route('/device/<device_id>/usage_graph.png')
 def device_image(device_id):
+    """
+    Handles dynamic loading graphs
+    Start and End time supplied as arguments in request
+
+    :param device_id: ID of device in inventory file
+
+    :return: response_graph
+    """
     start_time = None
     end_time = None
 

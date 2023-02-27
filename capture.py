@@ -15,8 +15,10 @@ class Periodic(object):
     """
     A periodic task running in threading.Timers
     Based on https://stackoverflow.com/questions/2398661/schedule-a-repeating-event-in-python-3
-    """
 
+    interval: Capture time interval
+    function: Function to be called every interval (e.g. snapshot)
+    """
     def __init__(self, interval, function, *args, **kwargs):
         self._lock = Lock()
         self._timer = None
@@ -55,12 +57,9 @@ def write_csv_line(device_id,
     """
     Writs data to a devices data .csv
 
-    :param device_id:
-    :param time_captured:
-    :param current:
-    :param voltage:
-    :param power:
-    :return:
+    :param device_id: Device ID
+    :param time_captured: Datetime of captured date
+    :param power: Consumption of device at snapshot in Watts
     """
 
     with open(f'data/{device_id}.csv', 'a', newline='') as csvfile:
@@ -71,6 +70,10 @@ def write_csv_line(device_id,
 
 
 def snapshot():
+    """
+    Take single snapshot of all connected devices
+    If device not connected (unreachable) assume power level of 0 Watts
+    """
     devices = get_devices()
 
     print("Snapshotting")
