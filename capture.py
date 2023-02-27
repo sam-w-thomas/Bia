@@ -76,6 +76,7 @@ def snapshot():
     print("Snapshotting")
 
     for device in devices:
+        power = 0.0
         if device.connected():
             device_stats = device.get_properties()
 
@@ -86,5 +87,5 @@ def snapshot():
 
             current_date = datetime.now()
 
-            write_csv_line(device.uuid, current_date, power)
+        write_csv_line(device.uuid, current_date, power)
 

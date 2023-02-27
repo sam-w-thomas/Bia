@@ -2,9 +2,11 @@
 {% block content %}
 <div class="container mt-3">
     {% set dev_connected = device.connected() %}
-    {% set history_empty = dev_history.empty() %}
-    {% set properties = device.get_properties() %}
-    {% set abilities = device.get_capability() %}
+    {% if dev_connected %}
+        {% set history_empty = dev_history.empty() %}
+        {% set properties = device.get_properties() %}
+        {% set abilities = device.get_capability() %}
+    {% endif %}
     <!-- Handle creation of ROW -->
     <div class="row mt-2">
         <div class="card">
