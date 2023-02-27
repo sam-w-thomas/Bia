@@ -15,8 +15,8 @@ KASA smart plugs are used when devices don't natively support grabbing power con
 * Custom TextFSM templates
 
 ## Usage
-1. Clone the repo from GitHub
-2. Change to local repository and ensure any permissions are correct (usually a Linux problem)
+1. Clone the repo from GitHub an
+2. Change to local repository and ensure any permissions are correct (usually a Linux problem). Add empty folder called "data"
 3. Install requirements `pip install -r requirements.txt`
 4. Launch main.py `python main.py`
 5. Connect to website 127.0.0.1:8080
