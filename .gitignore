@@ -1,4 +1,3 @@
-data
-inventory
+data/*
 .idea
 *pycache*
